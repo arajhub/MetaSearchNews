@@ -11,6 +11,8 @@ GoogleNews = "*"
 azure-cognitiveservices-search-newssearch = "*"
 newsapi = "*"
 newsapi-python = "*"
+pandas = "*"
+
 
 [requires]
 python_version = "3.7"

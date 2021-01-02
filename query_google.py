@@ -1,46 +1,40 @@
-#https://github.com/googleapis/google-api-python-client/tree/master/samples
-
-import asyncio
 from GoogleNews import GoogleNews
+import json
+from all_news import AllNews
 
-class GoogleApi:
-    def __init__(self):
-        self._api = self._get_api()
-def _get_news_for_word(self, word, top):
-        self._api.search(word)
-        text = self._api.result()
-        news = list(map(lambda x: self._clean(x['title']) + ' @ (' + x['date'] + ')', text))[:top]
-        return news
+# googlenews = GoogleNews()
+# googlenews = GoogleNews(lang='en')
+# googlenews.get_news('virus')
+# data_google = googlenews.results()
+# print(all)
 
-def _get_api(self):
-        return GoogleNews(period="1w")
 
-async def get_news_for_words(self, target_words, top=3):
-        text = {}
-        for word in target_words:
-            ts = self._get_news_for_word(word, top)
-            text[word] = ts
-        return text
+#def myconverter(o):
+#    if isinstance(o, datetime.datetime):
+#        return o.__str__()
 
-async def get_top_news(self):
-        return self._api.top_news()
-async def main():
-    """
-    Main method, call the appropriate methods
-    :return:
-    """
-    google_api = GoogleApi()
-    users = google_api.get_news_for_words(['bloomberg', 'cnbc'], 2)
 
-    print('LOCATION NEWS')
-    for location, news in trends_text.items():
-        print(f'Location: {location}  \n {news}')
-    print('\nWORD NEWS')
-    for word, news in words_text.items():
-        print(f'Word: {word}  \n {news}')
-    print('\nUSER NEWS')
-    for user, news in news_users.items():
-        print(f'User: {user}  \n {news}')
-    if __name__ == "__main__":
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(asyncio.wait([main()]))
+#with open('data_google.txt', 'w') as outfile:
+#    json.dump(data_google, default=myconverter, fp=outfile)
+
+
+def query_google_news(query):
+    with open('data_google.txt') as f:
+        res = json.load(f)
+    print(res)
+    rank = 0
+    all_news_list = []
+    for news in res:
+        rank = rank + 1
+        all_news = AllNews(news["desc"], news["title"]
+                           , category=None
+                           , date_time=news["datetime"]
+                           , rank=rank
+                           , src='google')
+        all_news_list.append(all_news)
+    return all_news_list
+
+if __name__ == '__main__':
+    result = query_google_news('virus')
+    for r in result:
+        print(r)

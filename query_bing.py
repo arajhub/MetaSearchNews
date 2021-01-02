@@ -10,11 +10,6 @@ from all_news import AllNews
 subscription_key = "YOUR-SUBSCRIPTION-KEY"
 endpoint = "YOUR-ENDPOINT"
 
-
-
-
-
-
 def search_bing(query):
 
     client = NewsSearchClient(endpoint=endpoint, credentials=CognitiveServicesCredentials(subscription_key))
@@ -56,13 +51,15 @@ def search_bing(query):
             news_result.total_estimated_matches))
         for news in news_result.value:
             rank = rank + 1
-            all_news =  AllNews(summary=news.description, title=news.name, category=None,
+            all_news = AllNews(summary=news.description, title=news.name, category=None,
                                 date_time=news.date_published, rank=rank, src="bing")
             bing_news_list.append(all_news)
     else:
         print("Didn't see any news result data..")
 
 
+if __name__ == '__main__':
+    search_bing('virus')
 
 
 
