@@ -2,6 +2,7 @@ from all_news import AllNews
 from query_newsapi import query_newsapi
 from query_google import query_google_news
 import pandas as pd
+import News_Api_2
 
 
 def search_news():
@@ -9,6 +10,7 @@ def search_news():
     print("Welcome to Meta News Search")
     query = input("Input your search query")
     result_from_all = query_newsapi(query) + query_google_news(query)
+    # result_from_all = News_Api_2.search_news_google() + News_Api_2.search_news_times_of_india()
     # for res in result_from_all:
     #     print(res)
     best_rank(result_from_all)
@@ -30,10 +32,12 @@ def search_news():
 def best_rank(all_search_result):
     df = pd.DataFrame([t.__dict__ for t in all_search_result])
     grouped_by_title = df.groupby('title')
-    df["rank_column"] = grouped_by_title[["rank"]].transform(min)
-    df = df.sort_values("rank_column", ascending=True)
-    df = df.drop("rank_column", axis=1)
-    print(df)
+    all_news_ranked = []
+    for key, values in grouped_by_title:
+        all_news_ranked.append(dict(type=key, items=min(values['rank'])))
+    ranked_news = pd.DataFrame([t for t in all_news_ranked])
+    print('After ranking')
+    print(ranked_news.sort_values(by='items'))
 
     '''
     b) Approach 2:
