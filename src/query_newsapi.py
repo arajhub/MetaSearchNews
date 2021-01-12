@@ -1,27 +1,21 @@
 from newsapi import NewsApiClient
-from pandas.io.json import json_normalize
 import pandas as pd
-import json
-from all_news import AllNews
+from src.all_news import AllNews
 
 
 def query_newsapi(query):
-    print(query)
     # Init
-    # newsapi = NewsApiClient(api_key='07c97109bbe442f9a44f30ee1ea92923')
+    newsapi = NewsApiClient(api_key='07c97109bbe442f9a44f30ee1ea92923')
 
     # newsapi.get_top_headlines(category=category,language='en', country=country)
 
-    # /v2/everything
-    # all_articles = newsapi.get_everything(q=query,
-    #                                      sources='bbc-news',
-    #                                      language='en',
-    #                                      page=1,
-    #                                      page_size=10)
-    # return all_articles
-
-    with open('data_all_news.txt') as f:
-        all_articles = json.load(f)
+    all_articles = newsapi.get_everything(q=query,
+                                          sources='bbc-news',
+                                          language='en',
+                                          page=1,
+                                          page_size=10)
+    # with open('data_all_news.txt') as f:
+    #     all_articles = json.load(f)
     print(all_articles)
     d = pd.json_normalize(all_articles['articles'])
     newdf = d[["description", "title", "publishedAt", "source.id"]]
@@ -29,11 +23,14 @@ def query_newsapi(query):
     all_news_list = []
     for index, row in newdf.iterrows():
         rank = rank + 1
-        all_news = AllNews(row["description"], row["title"]
-                           , category=None
-                           , date_time=row["publishedAt"]
-                           , rank=rank
-                           , src=row["source.id"])
+        if rank < 11:
+            all_news = AllNews(row["description"], row["title"]
+                               , category=None
+                               , date_time=row["publishedAt"]
+                               , rank=rank
+                               , src=row["source.id"])
+        else:
+            break
         all_news_list.append(all_news)
 
     return all_news_list
@@ -47,7 +44,6 @@ if __name__ == '__main__':
 
     for x in query_newsapi('virus'):
         print(x)
-
 
 '''
 

@@ -12,7 +12,7 @@ azure-cognitiveservices-search-newssearch = "*"
 newsapi = "*"
 newsapi-python = "*"
 pandas = "*"
-
+nltk = "*"
 
 [requires]
 python_version = "3.7"

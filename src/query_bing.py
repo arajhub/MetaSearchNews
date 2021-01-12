@@ -4,7 +4,7 @@
 
 from azure.cognitiveservices.search.newssearch import NewsSearchClient
 from msrest.authentication import CognitiveServicesCredentials
-from all_news import AllNews
+from src.all_news import AllNews
 
 
 subscription_key = "YOUR-SUBSCRIPTION-KEY"

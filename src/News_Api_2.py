@@ -1,9 +1,6 @@
 import requests
-from bs4 import BeautifulSoup
-import pprint
 import pandas as pd
-import numpy as np
-from all_news import AllNews
+from src.all_news import AllNews
 
 
 def search_news_google():
