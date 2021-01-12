@@ -5,11 +5,14 @@ from collections import Counter
 import operator
 import nltk
 from nltk.corpus import stopwords
+
+from src.all_news import AllNews
 from src.documents import Document
 from src.documents import Non_rel_doc
 from src.prox import *
 from src.check import *
 from src.word_set import Word_set
+import News_Api_2
 
 
 def stopWordElimination(all_words):
@@ -32,7 +35,7 @@ def search_news():
         original_q = input("Input your search query")
 
         result = query_newsapi(original_q) + query_google_news(original_q)
-
+        #result = News_Api_2.search_news_google() + News_Api_2.search_news_times_of_india()
         '''
         1: (Best Rank approach)
         This approach, place a URL at the best rank it gets in any of the search engine rankings.
@@ -41,9 +44,9 @@ def search_news():
         // MetaRank refers rank assigned by meta Search engine
     
         '''
-        #TODO: Fix this
-        #result = best_rank(result)
-
+        # done use any ranking
+        result = best_rank(result)
+        #result = custom_rank(result)
         docs = []
         scores_all = []
         Document.count = 0
@@ -104,7 +107,6 @@ def search_news():
 
         print(top_ten_prox_dict)
 
-
     # TODO:
 
     '''
@@ -119,12 +121,32 @@ def best_rank(all_search_result):
     df = pd.DataFrame([t.__dict__ for t in all_search_result])
     grouped_by_title = df.groupby('title')
     all_news_ranked = []
+    meta_rank = 0
     for key, values in grouped_by_title:
-        all_news_ranked.append(dict(type=key, items=min(values['rank'])))
-    ranked_news = pd.DataFrame([t for t in all_news_ranked])
-    print('After ranking')
-    print(ranked_news.sort_values(by='items'))
-    return ranked_news.sort_values(by='items')
+        all_news = AllNews(summary=values['summary'].iloc[0]
+                           , title=values['title'].iloc[0]
+                           , category=values['category'].iloc[0]
+                           , date_time=values['date_time'].iloc[0]
+                           , rank=min(values['rank'])
+                           , src=values['src'].iloc[0]
+                           , meta_rank=meta_rank)
+        all_news_ranked.append(all_news)
+    ranked_news = pd.DataFrame([t.__dict__ for t in all_news_ranked])
+    ranked_news.sort_values(by='rank', inplace=True)
+    ranked_news.reset_index(drop=True, inplace=True)
+    all_news_list = []
+    for index in range(0, len(ranked_news)):
+        meta_rank = meta_rank + 1
+        ranked_news.at[index, 'meta_rank'] = meta_rank
+        all_news = AllNews(ranked_news._get_value(index, 'summary'), ranked_news._get_value(index, 'title')
+                           , category=ranked_news._get_value(index, 'category')
+                           , date_time=ranked_news._get_value(index, 'date_time')
+                           , rank=ranked_news._get_value(index, 'rank')
+                           , src=ranked_news._get_value(index, 'src')
+                           , meta_rank=ranked_news._get_value(index, 'meta_rank'))
+        all_news_list.append(all_news)
+    ranked_news.to_csv(r'ResultantRanks_A1.txt', header=True, sep='\t', mode='w')
+    return all_news_list
 
     '''
     b) Approach 2:
@@ -137,7 +159,23 @@ def best_rank(all_search_result):
 
 
 def custom_rank(all_search_result):
-    raise NotImplementedError
+    ranked_news = pd.DataFrame([t.__dict__ for t in all_search_result])
+    ranked_news.sort_values(by='src', inplace=True)
+    ranked_news.reset_index(drop=True, inplace=True)
+    meta_rank = 0
+    all_news_list = []
+    for index in range(0, len(ranked_news)):
+        meta_rank = meta_rank + 1
+        ranked_news.at[index, 'meta_rank'] = meta_rank
+        all_news = AllNews(ranked_news._get_value(index,'summary'), ranked_news._get_value(index,'title')
+                           , category=ranked_news._get_value(index,'category')
+                           , date_time=ranked_news._get_value(index,'date_time')
+                           , rank=ranked_news._get_value(index,'rank')
+                           , src=ranked_news._get_value(index,'src')
+                           , meta_rank=ranked_news._get_value(index,'meta_rank'))
+        all_news_list.append(all_news)
+    ranked_news.to_csv(r'ResultantRanks_A2.txt', header=True, sep='\t', mode='w')
+    return all_news_list
 
 
 def Initial(augment, modified_q, curr_precision):
