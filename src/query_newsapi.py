@@ -23,7 +23,7 @@ def query_newsapi(query):
     all_news_list = []
     for index, row in newdf.iterrows():
         rank = rank + 1
-        if rank < 11:
+        if rank < 51:
             all_news = AllNews(row["description"], row["title"]
                                , category=None
                                , date_time=row["publishedAt"]

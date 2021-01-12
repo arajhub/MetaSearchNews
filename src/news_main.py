@@ -12,7 +12,6 @@ from src.documents import Non_rel_doc
 from src.prox import *
 from src.check import *
 from src.word_set import Word_set
-import News_Api_2
 
 
 def stopWordElimination(all_words):
@@ -35,7 +34,7 @@ def search_news():
         original_q = input("Input your search query")
 
         result = query_newsapi(original_q) + query_google_news(original_q)
-        #result = News_Api_2.search_news_google() + News_Api_2.search_news_times_of_india()
+        # result = News_Api_2.search_news_google() + News_Api_2.search_news_times_of_india()
         '''
         1: (Best Rank approach)
         This approach, place a URL at the best rank it gets in any of the search engine rankings.
@@ -45,8 +44,8 @@ def search_news():
     
         '''
         # done use any ranking
-        result = best_rank(result)
-        #result = custom_rank(result)
+        # result = best_rank(result)
+        result = custom_rank(result)
         docs = []
         scores_all = []
         Document.count = 0
@@ -54,12 +53,15 @@ def search_news():
         Rel_doc.count = 0
         Non_rel_doc.count = 0
 
+        index = 0
+
         for x in result:
-            print("\n Result :", x.rank)
+            index = index + 1
+            print("\n Result :", index)
             print("\nTitle: " + x.title)
             print("summary: " + x.summary)
             print("date_time: " + str(x.date_time))
-            print("rank: " + str(x.rank))
+            print("rank: " + str(x.meta_rank))
 
             # nltk.download('punkt')
             # nltk.download('stopwords')
@@ -100,11 +102,14 @@ def search_news():
 
         top_ten = {}
 
+        print(Word_set)
+
         for j in range(0, 10):
             top_ten[w] = Word_set.prox[w]
 
         top_ten_prox_dict = sorted(top_ten.items(), key=operator.itemgetter(1), reverse=True)
 
+        print("====================")
         print(top_ten_prox_dict)
 
     # TODO:
@@ -167,12 +172,12 @@ def custom_rank(all_search_result):
     for index in range(0, len(ranked_news)):
         meta_rank = meta_rank + 1
         ranked_news.at[index, 'meta_rank'] = meta_rank
-        all_news = AllNews(ranked_news._get_value(index,'summary'), ranked_news._get_value(index,'title')
-                           , category=ranked_news._get_value(index,'category')
-                           , date_time=ranked_news._get_value(index,'date_time')
-                           , rank=ranked_news._get_value(index,'rank')
-                           , src=ranked_news._get_value(index,'src')
-                           , meta_rank=ranked_news._get_value(index,'meta_rank'))
+        all_news = AllNews(ranked_news._get_value(index, 'summary'), ranked_news._get_value(index, 'title')
+                           , category=ranked_news._get_value(index, 'category')
+                           , date_time=ranked_news._get_value(index, 'date_time')
+                           , rank=ranked_news._get_value(index, 'rank')
+                           , src=ranked_news._get_value(index, 'src')
+                           , meta_rank=ranked_news._get_value(index, 'meta_rank'))
         all_news_list.append(all_news)
     ranked_news.to_csv(r'ResultantRanks_A2.txt', header=True, sep='\t', mode='w')
     return all_news_list

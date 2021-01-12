@@ -31,7 +31,7 @@ def query_google_news(query):
     all_news_list = []
     for news in res:
         rank = rank + 1
-        if rank < 11:
+        if rank < 51:
             all_news = AllNews(news["desc"], news["title"]
                                , category=None
                                , date_time=news["datetime"]
